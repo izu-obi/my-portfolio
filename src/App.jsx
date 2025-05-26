@@ -9,7 +9,7 @@ import { Element } from 'react-scroll';
 
 function App() {
   return (
-    <div className="font-sans">
+    <div className="font-sans scroll-smooth">
       <Navbar />
       <Element name="home"><Home /></Element>
       <Element name="projects"><Projects /></Element>
