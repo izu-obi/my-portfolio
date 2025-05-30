@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FaLinkedin, FaWhatsapp, FaGithub, FaEnvelope, FaPhone } from 'react-icons/fa';
 
 export const Contact = () => (
-  <section className="py-16 px-4 bg-gray-100 dark:bg-gray-800">
+  <section className="py-16 px-4">
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}

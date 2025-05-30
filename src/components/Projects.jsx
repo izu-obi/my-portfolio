@@ -10,14 +10,14 @@ const projects = [
 ];
 
 export const Projects = () => (
-  <section id='projects' className="py-16 px-4 bg-gray-100 dark:bg-gray-800">
+  <section id='projects' className="py-16 px-4">
     <h2 className="text-3xl font-bold text-center mb-10">Projects</h2>
     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
       {projects.map((proj, idx) => (
-        <motion.div key={idx} whileHover={{ scale: 1.05 }} className="bg-white dark:bg-gray-700 p-4 rounded shadow">
+        <motion.div key={idx} whileHover={{ scale: 1.05 }} className="bg-white dark:bg-gray-700 p-4 rounded shadow text-left">
           <img src={proj.image} alt={proj.title} className="w-full h-48 object-cover rounded mb-4" />
           <h3 className="text-xl font-semibold mb-2">{proj.title}</h3>
-          <p className="mb-4 text-sm">{proj.description}</p>
+          <p className="mb-4 text-sm ">{proj.description}</p>
           <a href={proj.link} target='_blank' className="text-blue-600 hover:underline">View Project</a>
         </motion.div>
       ))}

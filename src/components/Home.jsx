@@ -20,7 +20,7 @@ export const Home = () => (
         className="mb-6 w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-white shadow-lg"
       >
         <img 
-          src="/images/profile2.jpg"
+          src="/images/profile.jpg"
           alt="Profile"
           className="w-full h-full object-cover"
         />

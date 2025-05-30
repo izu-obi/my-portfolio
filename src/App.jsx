@@ -6,17 +6,24 @@ import { Contact } from './components/Contact';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Element } from 'react-scroll';
+import Background from './components/Background';
+import './App.css';
 
 function App() {
   return (
-    <div className="font-sans scroll-smooth">
-      <Navbar />
-      <Element name="home"><Home /></Element>
-      <Element name="projects"><Projects /></Element>
-      <Element name="resume"><Resume /></Element>
-      <Element name="contact"><Contact /></Element>
-      <Footer />
-    </div>
+    <>
+      <Background />
+      <div className="font-sans scroll-smooth">
+        <Navbar />
+        <div className="relative z-10">
+          <Element name="home"><Home /></Element>
+          <Element name="projects"><Projects /></Element>
+          <Element name="resume"><Resume /></Element>
+          <Element name="contact"><Contact /></Element>
+          <Footer />
+        </div>
+      </div>
+    </>
   );
 }
 
