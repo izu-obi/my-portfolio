@@ -5,8 +5,14 @@ export default function Background() {
   const animationRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isLightMode, setIsLightMode] = useState(false);
 
   useEffect(() => {
+    // Check system color scheme
+    const checkColorScheme = () => {
+      setIsLightMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+    };
+
     // Check if mobile device
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -48,17 +54,38 @@ export default function Background() {
     let nebulaClouds = [];
     const planetImages = {};
 
-    // Planet sources with optimized mobile versions
+    // Color schemes for light/dark mode
+    const colorSchemes = {
+      dark: {
+        background: ['#0a0a0a', '#1a1a2e', '#16213e'],
+        star: 'white',
+        shootingStar: 'cyan',
+        nebulaBaseHue: 240,
+        nebulaSaturation: '50%',
+        nebulaLightness: '15%',
+        planetGlowOpacity: '40',
+        orbitalTrailOpacity: 0.1
+      },
+      light: {
+        background: ['#f0f2ff', '#d6e0ff', '#b3c6ff'],
+        star: '#333',
+        shootingStar: '#0066ff',
+        nebulaBaseHue: 220,
+        nebulaSaturation: '30%',
+        nebulaLightness: '85%',
+        planetGlowOpacity: '30',
+        orbitalTrailOpacity: 0.05
+      }
+    };
+
+    // Get current color scheme
+    const getColors = () => colorSchemes[isLightMode ? 'light' : 'dark'];
+
+    // Planet sources
     const planetSources = {
-      earth: isMobile 
-        ? 'https://www.pngmart.com/files/3/Earth-PNG-Transparent-Image.png' 
-        : 'https://www.pngmart.com/files/3/Earth-PNG-Transparent-Image.png',
-      venus: isMobile 
-        ? 'https://www.pngmart.com/files/3/Venus-PNG-Transparent-Image.png' 
-        : 'https://www.pngmart.com/files/3/Venus-PNG-Transparent-Image.png',
-      jupiter: isMobile 
-        ? 'https://www.pngmart.com/files/3/Jupiter-PNG-Transparent-Image.png' 
-        : 'https://www.pngmart.com/files/3/Jupiter-PNG-Transparent-Image.png'
+      earth: 'https://www.pngmart.com/files/3/Earth-PNG-Transparent-Image.png',
+      venus: 'https://www.pngmart.com/files/3/Venus-PNG-Transparent-Image.png',
+      jupiter: 'https://www.pngmart.com/files/3/Jupiter-PNG-Transparent-Image.png'
     };
 
     const loadImages = () => {
@@ -79,10 +106,15 @@ export default function Background() {
             fallbackCanvas.height = 100;
             const fallbackCtx = fallbackCanvas.getContext('2d');
             
-            const colors = { earth: '#4A90E2', venus: '#FFA500', jupiter: '#FF6B6B' };
+            const colors = { 
+              earth: isLightMode ? '#6b9eff' : '#4A90E2', 
+              venus: isLightMode ? '#ffb347' : '#FFA500', 
+              jupiter: isLightMode ? '#ff8080' : '#FF6B6B' 
+            };
+            
             const gradient = fallbackCtx.createRadialGradient(50, 35, 0, 50, 50, 50);
             gradient.addColorStop(0, colors[key] || '#4A90E2');
-            gradient.addColorStop(1, '#000');
+            gradient.addColorStop(1, isLightMode ? '#ffffff' : '#000');
             
             fallbackCtx.fillStyle = gradient;
             fallbackCtx.beginPath();
@@ -100,8 +132,7 @@ export default function Background() {
     // Responsive planet configuration
     const getPlanetConfig = () => {
       const baseSize = Math.min(width, height) * (isMobile ? 0.03 : 0.04);
-      const centerX = width / 2;
-      const centerY = height / 2;
+      const colors = getColors();
       
       return [
         { 
@@ -110,7 +141,7 @@ export default function Background() {
           key: 'earth', 
           speed: isMobile ? 0.008 : 0.012, 
           angleOffset: 0,
-          color: '#4A90E2'
+          color: isLightMode ? '#6b9eff' : '#4A90E2'
         },
         { 
           orbitRadius: Math.min(width, height) * (isMobile ? 0.2 : 0.25), 
@@ -118,7 +149,7 @@ export default function Background() {
           key: 'venus', 
           speed: isMobile ? 0.005 : 0.008, 
           angleOffset: Math.PI / 3,
-          color: '#FFA500'
+          color: isLightMode ? '#ffb347' : '#FFA500'
         },
         { 
           orbitRadius: Math.min(width, height) * (isMobile ? 0.3 : 0.35), 
@@ -126,14 +157,14 @@ export default function Background() {
           key: 'jupiter', 
           speed: isMobile ? 0.003 : 0.005, 
           angleOffset: Math.PI,
-          color: '#FF6B6B'
+          color: isLightMode ? '#ff8080' : '#FF6B6B'
         }
       ];
     };
 
     let planets = getPlanetConfig();
 
-    // Optimized star generation for mobile
+    // Optimized star generation
     const generateStars = () => {
       const starCount = isMobile 
         ? Math.floor((width * height) / 12000) 
@@ -150,7 +181,7 @@ export default function Background() {
       }));
     };
 
-    // Reduced shooting stars on mobile
+    // Shooting stars
     const generateShootingStars = () => {
       const count = isMobile 
         ? Math.max(1, Math.floor(width / 1200))
@@ -167,8 +198,9 @@ export default function Background() {
       }));
     };
 
-    // Fewer nebula clouds on mobile
+    // Nebula clouds
     const generateNebulaClouds = () => {
+      const colors = getColors();
       const count = isMobile 
         ? Math.max(1, Math.floor(width / 800))
         : Math.max(2, Math.floor(width / 600));
@@ -177,13 +209,14 @@ export default function Background() {
         x: Math.random() * width,
         y: Math.random() * height,
         radius: Math.random() * (isMobile ? 150 : 200) + (isMobile ? 50 : 100),
-        color: `hsl(${Math.random() * 60 + 240}, 50%, 15%)`,
+        color: `hsl(${colors.nebulaBaseHue + Math.random() * 60}, ${colors.nebulaSaturation}, ${colors.nebulaLightness})`,
         drift: Math.random() * 0.2 + 0.1
       }));
     };
 
     const resize = () => {
       checkIfMobile();
+      checkColorScheme();
       setCanvasSize();
       
       planets = getPlanetConfig();
@@ -193,13 +226,14 @@ export default function Background() {
     };
 
     const drawNebula = () => {
+      const colors = getColors();
       nebulaClouds.forEach(cloud => {
         const gradient = ctx.createRadialGradient(
           cloud.x, cloud.y, 0,
           cloud.x, cloud.y, cloud.radius
         );
-        gradient.addColorStop(0, cloud.color.replace('15%', '25%'));
-        gradient.addColorStop(0.5, cloud.color.replace('15%', '10%'));
+        gradient.addColorStop(0, cloud.color.replace(/\d+%\)$/, isLightMode ? '75%)' : '25%)'));
+        gradient.addColorStop(0.5, cloud.color.replace(/\d+%\)$/, isLightMode ? '90%)' : '10%)'));
         gradient.addColorStop(1, 'transparent');
         
         ctx.fillStyle = gradient;
@@ -218,6 +252,7 @@ export default function Background() {
     };
 
     const drawStars = () => {
+      const colors = getColors();
       stars.forEach(star => {
         // Reduced parallax effect on mobile
         const parallaxFactor = isMobile 
@@ -248,8 +283,8 @@ export default function Background() {
         if (star.type === 'bright') {
           // Bright stars with cross pattern
           ctx.shadowBlur = isMobile ? 5 : 8;
-          ctx.shadowColor = 'white';
-          ctx.strokeStyle = 'white';
+          ctx.shadowColor = colors.star;
+          ctx.strokeStyle = colors.star;
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(star.x - star.radius * 2, star.y);
@@ -262,9 +297,9 @@ export default function Background() {
         // Main star body
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = colors.star;
         ctx.shadowBlur = star.type === 'bright' ? (isMobile ? 4 : 6) : (isMobile ? 2 : 3);
-        ctx.shadowColor = 'white';
+        ctx.shadowColor = colors.star;
         ctx.fill();
         
         ctx.restore();
@@ -272,6 +307,7 @@ export default function Background() {
     };
 
     const drawShootingStars = () => {
+      const colors = getColors();
       shootingStars.forEach(s => {
         // Add point to trail
         s.trail.push({ x: s.x, y: s.y });
@@ -281,9 +317,9 @@ export default function Background() {
         if (s.trail.length > 1) {
           ctx.save();
           ctx.globalAlpha = s.opacity;
-          ctx.strokeStyle = 'white';
+          ctx.strokeStyle = colors.star;
           ctx.shadowBlur = isMobile ? 10 : 15;
-          ctx.shadowColor = 'cyan';
+          ctx.shadowColor = colors.shootingStar;
           
           for (let i = 1; i < s.trail.length; i++) {
             const alpha = i / s.trail.length;
@@ -312,6 +348,7 @@ export default function Background() {
     };
 
     const drawPlanets = () => {
+      const colors = getColors();
       planets.forEach(p => {
         const x = width / 2 + Math.cos(angle * p.speed + p.angleOffset) * p.orbitRadius;
         const y = height / 2 + Math.sin(angle * p.speed + p.angleOffset) * p.orbitRadius;
@@ -320,7 +357,7 @@ export default function Background() {
         ctx.save();
         
         // Orbital trail (faint)
-        ctx.globalAlpha = 0.1;
+        ctx.globalAlpha = colors.orbitalTrailOpacity;
         ctx.strokeStyle = p.color;
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -331,7 +368,7 @@ export default function Background() {
         
         // Planet glow
         const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, p.radius * 2);
-        glowGradient.addColorStop(0, `${p.color}40`);
+        glowGradient.addColorStop(0, `${p.color}${colors.planetGlowOpacity}`);
         glowGradient.addColorStop(1, 'transparent');
         ctx.fillStyle = glowGradient;
         ctx.beginPath();
@@ -359,13 +396,14 @@ export default function Background() {
       ctx.clearRect(0, 0, width, height);
       
       // Draw background gradient
+      const colors = getColors();
       const bgGradient = ctx.createRadialGradient(
         width / 2, height / 2, 0,
         width / 2, height / 2, Math.max(width, height)
       );
-      bgGradient.addColorStop(0, '#0a0a0a');
-      bgGradient.addColorStop(0.5, '#1a1a2e');
-      bgGradient.addColorStop(1, '#16213e');
+      bgGradient.addColorStop(0, colors.background[0]);
+      bgGradient.addColorStop(0.5, colors.background[1]);
+      bgGradient.addColorStop(1, colors.background[2]);
       ctx.fillStyle = bgGradient;
       ctx.fillRect(0, 0, width, height);
 
@@ -388,12 +426,22 @@ export default function Background() {
       resize();
     };
 
+    const handleColorSchemeChange = (e) => {
+      setIsLightMode(e.matches);
+      resize();
+    };
+
     // Event listeners
     window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
+    
+    // Set up color scheme listener
+    const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
+    colorSchemeQuery.addEventListener('change', handleColorSchemeChange);
 
     // Initialize
     checkIfMobile();
+    checkColorScheme();
     loadImages().then(() => {
       resize();
       setIsLoaded(true);
@@ -404,22 +452,34 @@ export default function Background() {
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
+      colorSchemeQuery.removeEventListener('change', handleColorSchemeChange);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [isLightMode]);
+
+  // Get the appropriate background gradient for the loading state
+  const loadingBackground = isLightMode 
+    ? 'bg-gradient-to-br from-blue-50 to-indigo-100'
+    : 'bg-gradient-to-br from-gray-900 to-black';
 
   return (
     <div className="fixed inset-0 z-[-1]">
       <canvas
         ref={canvasRef}
         className="w-full h-full"
-        style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)' }}
+        style={{ 
+          background: isLightMode 
+            ? 'linear-gradient(135deg, #f0f2ff 0%, #d6e0ff 50%, #b3c6ff 100%)' 
+            : 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)'
+        }}
       />
       {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-          <div className="text-white text-lg animate-pulse">Loading cosmic view...</div>
+        <div className={`absolute inset-0 flex items-center justify-center ${loadingBackground}`}>
+          <div className={`text-lg animate-pulse ${isLightMode ? 'text-indigo-800' : 'text-white'}`}>
+            Loading cosmic view...
+          </div>
         </div>
       )}
     </div>
