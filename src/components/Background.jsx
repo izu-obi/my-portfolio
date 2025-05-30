@@ -4,18 +4,39 @@ export default function Background() {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Check if mobile device
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
 
-    // Responsive sizing
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    // Responsive sizing with devicePixelRatio consideration
+    const setCanvasSize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      
+      // Set canvas CSS size
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      
+      // Set canvas drawing buffer size
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      
+      // Scale context to account for DPR
+      ctx.scale(dpr, dpr);
+    };
+
+    let width, height;
+    setCanvasSize();
 
     let mouseX = width / 2;
     let mouseY = height / 2;
@@ -27,11 +48,17 @@ export default function Background() {
     let nebulaClouds = [];
     const planetImages = {};
 
-    // Enhanced planet sources with fallbacks
+    // Planet sources with optimized mobile versions
     const planetSources = {
-      earth: 'https://www.pngmart.com/files/3/Earth-PNG-Transparent-Image.png',
-      venus: 'https://www.pngmart.com/files/3/Venus-PNG-Transparent-Image.png',
-      jupiter: 'https://www.pngmart.com/files/3/Jupiter-PNG-Transparent-Image.png'
+      earth: isMobile 
+        ? 'https://www.pngmart.com/files/3/Earth-PNG-Transparent-Image.png' 
+        : 'https://www.pngmart.com/files/3/Earth-PNG-Transparent-Image.png',
+      venus: isMobile 
+        ? 'https://www.pngmart.com/files/3/Venus-PNG-Transparent-Image.png' 
+        : 'https://www.pngmart.com/files/3/Venus-PNG-Transparent-Image.png',
+      jupiter: isMobile 
+        ? 'https://www.pngmart.com/files/3/Jupiter-PNG-Transparent-Image.png' 
+        : 'https://www.pngmart.com/files/3/Jupiter-PNG-Transparent-Image.png'
     };
 
     const loadImages = () => {
@@ -70,34 +97,34 @@ export default function Background() {
       return Promise.all(promises);
     };
 
-    // Enhanced planet configuration with varied speeds and orbits
+    // Responsive planet configuration
     const getPlanetConfig = () => {
-      const baseSize = Math.min(width, height) * 0.04;
+      const baseSize = Math.min(width, height) * (isMobile ? 0.03 : 0.04);
       const centerX = width / 2;
       const centerY = height / 2;
       
       return [
         { 
-          orbitRadius: Math.min(width, height) * 0.15, 
+          orbitRadius: Math.min(width, height) * (isMobile ? 0.12 : 0.15), 
           radius: baseSize, 
           key: 'earth', 
-          speed: 0.012, 
+          speed: isMobile ? 0.008 : 0.012, 
           angleOffset: 0,
           color: '#4A90E2'
         },
         { 
-          orbitRadius: Math.min(width, height) * 0.25, 
+          orbitRadius: Math.min(width, height) * (isMobile ? 0.2 : 0.25), 
           radius: baseSize * 0.8, 
           key: 'venus', 
-          speed: 0.008, 
+          speed: isMobile ? 0.005 : 0.008, 
           angleOffset: Math.PI / 3,
           color: '#FFA500'
         },
         { 
-          orbitRadius: Math.min(width, height) * 0.35, 
-          radius: baseSize * 1.5, 
+          orbitRadius: Math.min(width, height) * (isMobile ? 0.3 : 0.35), 
+          radius: baseSize * (isMobile ? 1.2 : 1.5), 
           key: 'jupiter', 
-          speed: 0.005, 
+          speed: isMobile ? 0.003 : 0.005, 
           angleOffset: Math.PI,
           color: '#FF6B6B'
         }
@@ -106,51 +133,58 @@ export default function Background() {
 
     let planets = getPlanetConfig();
 
-    // Enhanced star generation with different types
+    // Optimized star generation for mobile
     const generateStars = () => {
-      const starCount = Math.floor((width * height) / 8000);
+      const starCount = isMobile 
+        ? Math.floor((width * height) / 12000) 
+        : Math.floor((width * height) / 8000);
+      
       stars = Array.from({ length: starCount }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 2 + 0.5,
+        radius: Math.random() * (isMobile ? 1.5 : 2) + 0.5,
         speed: Math.random() * 0.3 + 0.1,
         twinkle: Math.random() * Math.PI * 2,
         brightness: Math.random() * 0.5 + 0.5,
-        type: Math.random() > 0.95 ? 'bright' : 'normal'
+        type: Math.random() > (isMobile ? 0.98 : 0.95) ? 'bright' : 'normal'
       }));
     };
 
-    // Enhanced shooting stars
+    // Reduced shooting stars on mobile
     const generateShootingStars = () => {
-      const count = Math.max(1, Math.floor(width / 800));
+      const count = isMobile 
+        ? Math.max(1, Math.floor(width / 1200))
+        : Math.max(1, Math.floor(width / 800));
+      
       shootingStars = Array.from({ length: count }, () => ({
         x: Math.random() * width - 200,
         y: Math.random() * height * 0.6,
-        speedX: Math.random() * 3 + 4,
-        speedY: Math.random() * 1.5 + 0.5,
-        length: Math.random() * 80 + 60,
+        speedX: Math.random() * (isMobile ? 2 : 3) + (isMobile ? 2 : 4),
+        speedY: Math.random() * (isMobile ? 1 : 1.5) + 0.5,
+        length: Math.random() * (isMobile ? 40 : 80) + (isMobile ? 30 : 60),
         opacity: Math.random() * 0.5 + 0.5,
         trail: []
       }));
     };
 
-    // Add nebula clouds for depth
+    // Fewer nebula clouds on mobile
     const generateNebulaClouds = () => {
-      const count = Math.max(2, Math.floor(width / 600));
+      const count = isMobile 
+        ? Math.max(1, Math.floor(width / 800))
+        : Math.max(2, Math.floor(width / 600));
+      
       nebulaClouds = Array.from({ length: count }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 200 + 100,
+        radius: Math.random() * (isMobile ? 150 : 200) + (isMobile ? 50 : 100),
         color: `hsl(${Math.random() * 60 + 240}, 50%, 15%)`,
         drift: Math.random() * 0.2 + 0.1
       }));
     };
 
     const resize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      checkIfMobile();
+      setCanvasSize();
       
       planets = getPlanetConfig();
       generateStars();
@@ -185,8 +219,11 @@ export default function Background() {
 
     const drawStars = () => {
       stars.forEach(star => {
-        // Enhanced parallax effect
-        const parallaxFactor = star.type === 'bright' ? 0.001 : 0.0003;
+        // Reduced parallax effect on mobile
+        const parallaxFactor = isMobile 
+          ? (star.type === 'bright' ? 0.0005 : 0.0001)
+          : (star.type === 'bright' ? 0.001 : 0.0003);
+        
         const dx = (mouseX - width / 2) * parallaxFactor;
         const dy = (mouseY - height / 2) * parallaxFactor;
         star.x += dx;
@@ -210,7 +247,7 @@ export default function Background() {
         
         if (star.type === 'bright') {
           // Bright stars with cross pattern
-          ctx.shadowBlur = 8;
+          ctx.shadowBlur = isMobile ? 5 : 8;
           ctx.shadowColor = 'white';
           ctx.strokeStyle = 'white';
           ctx.lineWidth = 1;
@@ -226,7 +263,7 @@ export default function Background() {
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fillStyle = 'white';
-        ctx.shadowBlur = star.type === 'bright' ? 6 : 3;
+        ctx.shadowBlur = star.type === 'bright' ? (isMobile ? 4 : 6) : (isMobile ? 2 : 3);
         ctx.shadowColor = 'white';
         ctx.fill();
         
@@ -238,14 +275,14 @@ export default function Background() {
       shootingStars.forEach(s => {
         // Add point to trail
         s.trail.push({ x: s.x, y: s.y });
-        if (s.trail.length > 8) s.trail.shift();
+        if (s.trail.length > (isMobile ? 5 : 8)) s.trail.shift();
 
         // Draw trail
         if (s.trail.length > 1) {
           ctx.save();
           ctx.globalAlpha = s.opacity;
           ctx.strokeStyle = 'white';
-          ctx.shadowBlur = 15;
+          ctx.shadowBlur = isMobile ? 10 : 15;
           ctx.shadowColor = 'cyan';
           
           for (let i = 1; i < s.trail.length; i++) {
@@ -303,7 +340,7 @@ export default function Background() {
 
         // Draw planet
         if (img) {
-          ctx.shadowBlur = 15;
+          ctx.shadowBlur = isMobile ? 10 : 15;
           ctx.shadowColor = p.color;
           ctx.drawImage(
             img, 
@@ -337,7 +374,7 @@ export default function Background() {
       drawShootingStars();
       drawPlanets();
 
-      angle += 0.3;
+      angle += isMobile ? 0.2 : 0.3;
       time++;
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -356,6 +393,7 @@ export default function Background() {
     window.addEventListener('mousemove', handleMouseMove);
 
     // Initialize
+    checkIfMobile();
     loadImages().then(() => {
       resize();
       setIsLoaded(true);
