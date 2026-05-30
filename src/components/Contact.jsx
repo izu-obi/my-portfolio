@@ -11,23 +11,23 @@ export const Contact = () => (
       viewport={{ once: true }}
       className="max-w-xl mx-auto"
     >
-      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">Contact Me</h2>
+      <h2 className="text-3xl font-bold mb-8 text-center text-white">Contact Me</h2>
       
       <div className="flex flex-col md:flex-row items-center justify-between gap-8">
         {/* Left Side - Contact Info */}
-        <div className="space-y-4 text-gray-700 dark:text-gray-300">
+        <div className="space-y-4 text-gray-300">
           <div className="flex items-center space-x-3">
-            <FaEnvelope className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <FaEnvelope className="text-blue-400 flex-shrink-0" />
             <a 
               href="mailto:izuobi25@gmail.com" 
-              className="text-blue-600 dark:text-blue-400"
+              className="text-blue-600"
             >
               izuobi25@gmail.com
             </a>
           </div>
           
           <div className="flex items-center space-x-3">
-            <FaPhone className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <FaPhone className="text-blue-400 flex-shrink-0" />
             <a 
               href="tel:+2348071371103" 
               className="text-blue-600 dark:text-blue-400"
@@ -39,7 +39,7 @@ export const Contact = () => (
 
         {/* Right Side - Social Media */}
         <div className="flex flex-col items-center md:items-center">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Connect with me</h3>
+          <h3 className="text-xl font-semibold mb-4 text-white">Connect with me</h3>
           <div className="flex space-x-4">
             <motion.a
               href="https://www.linkedin.com/in/izuchukwu-obi-96a60a2a9"
@@ -66,7 +66,7 @@ export const Contact = () => (
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.1 }}
-              className="text-gray-800 hover:text-black dark:text-gray-200 dark:hover:text-white"
+              className="text-gray-200 hover:text-white"
             >
               <FaGithub size={20} />
             </motion.a>
